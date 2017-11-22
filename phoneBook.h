@@ -8,7 +8,7 @@ struct phoneEntry {
     long int location; // ftell
     char firstName[25];
     char lastName[25];
-    char phone[11];
+    char phone[12];
     char city[25];
     char address[50];
     unsigned char deleted; //soft delete
