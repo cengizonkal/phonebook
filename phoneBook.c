@@ -72,7 +72,7 @@ void deletePhoneEntry(FILE *fp, long int location) {
     fseek(fp, location, SEEK_SET);
     fread(&entry, sizeof(struct phoneEntry), 1, fp);
     entry.deleted = 1;
-    fseek(fp, location, SEEK_SET);
+    fseek(fp, -sizeof(struct phoneEntry), SEEK_CUR);
     fwrite(&entry, sizeof(struct phoneEntry), 1, fp);
 }
 
