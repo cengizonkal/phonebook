@@ -1,6 +1,8 @@
 #include <stdio.h>
 
 #include "phoneBook.h"
+#include "strhlp.h"
+
 
 int main() {
     int choice = 1;
@@ -9,22 +11,17 @@ int main() {
     struct phoneEntry activeEntry;
     int phoneEntryCount = 0;
     int index = 0;
-
     FILE *fp;
 
+    // open file
     fp = fopen("phonebook.dat", "r+");
     if (fp == NULL) {
         fp = fopen("phonebook.dat", "w+");
     }
 
+
     for (; choice != 0;) {
-        printf("\n--------------Menu-------------");
-        printf("\n1- Search");
-        printf("\n2- Add");
-        printf("\n3- Delete");
-        printf("\n4- Update");
-        printf("\n0- Exit");
-        printf("\n-------------------------------");
+        printMenu();
         printf("\nPlease select : ");
         scanf("%d", &choice);
 
@@ -36,19 +33,10 @@ int main() {
                 printPhoneEntries(activeEntries, phoneEntryCount);
                 break;
             case 2:
-                printf("\nFirst Name:");
-                scanf("%s", activeEntry.firstName);
-                printf("\nLast Name:");
-                scanf("%s", activeEntry.lastName);
-                printf("\nPhone:");
-                scanf("%s", activeEntry.phone);
-                printf("\nCity:");
-                scanf("%s", activeEntry.city);
-                printf("\nAddress:");
-                scanf("%s", activeEntry.address);
+                createPhoneEntry(&activeEntry);
                 addToPhoneBook(fp, activeEntry);
-                printPhoneEntry(activeEntry);
-                printf("\n Entry Saved ...");
+                printPhoneEntry(activeEntry, 1);
+                printSuccess("\n Entry Saved ...");
                 break;
             case 3:
 
@@ -56,9 +44,8 @@ int main() {
                 scanf("%s", query);
                 phoneEntryCount = searchPhoneBook(fp, query, &activeEntries);
                 printPhoneEntries(activeEntries, phoneEntryCount);
-
                 if (phoneEntryCount == 0) {
-                    printf("\nNo records found");
+                    printWarning("\nNo records found");
                     break;
                 }
 
@@ -68,13 +55,35 @@ int main() {
 
                 } while (index < 0 || index >= phoneEntryCount);
                 deletePhoneEntry(fp, activeEntries[index].location);
-                printf("\nDeleted");
+                printSuccess("\nDeleted");
+                break;
+            case 4:
+                printf("\nQuery:");
+                scanf("%s", query);
+                phoneEntryCount = searchPhoneBook(fp, query, &activeEntries);
+                printPhoneEntries(activeEntries, phoneEntryCount);
+                if (phoneEntryCount == 0) {
+                    printf("\nNo records found");
+                    break;
+                }
+
+                do {
+                    printf("\nPlease select record index to update:");
+                    scanf("%d", &index);
+
+                } while (index < 0 || index >= phoneEntryCount);
+
+                createPhoneEntry(&activeEntries[index]);
+                updatePhoneEntry(fp, activeEntries[index]);
+                printSuccess("\nUpdated");
                 break;
             default:
                 break;
         }
     }
     fclose(fp);
+    clearPhonebook(); // remove soft deleted records
     printf("Bye...\n");
     return 0;
 }
+
